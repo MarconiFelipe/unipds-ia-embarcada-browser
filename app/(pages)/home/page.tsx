@@ -43,7 +43,11 @@ export default function Home() {
         const id = Date.now()
         setHistory(prev => [{ id, question: q, answer: "Awaiting response..." }, ...prev])
         setQuestion("")
-        const answer = await aimodelRef.current?.sendMessage(q)
+        const historyContext = history.filter(h => ![`Model initialization OK?`].includes(h.question)).map(h => ({
+            user: h.question,
+            system: h.answer
+        }))
+        const answer = await aimodelRef.current?.sendMessage(q, historyContext)
             ?? 'AI Service unavailable.'
         setHistory(prev => prev.map(item => (item.id === id ? { ...item, answer } : item)))
     }

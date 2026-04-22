@@ -22,21 +22,32 @@ export class AIModelService implements IAIModelInterface {
         });
     }
 
-    async sendMessage(message: string): Promise<string> {
+    async sendMessage(message: string, history: any[] = []): Promise<string> {
         const availability = await (window as any).LanguageModel.availability({
             languages: ['pt', 'en']
         });
         if (availability == 'available') {
             console.log('Language model is available');
 
-            const initialPrompts = [
+            let initialPrompts = [
                 {
                     role: 'system',
                     content: `Voce e um assistente de IA que responde de forma objetiva.
-                            Busque responder com no maximo 50 palavras.         
+                            Busque responder com no maximo 80 palavras.         
                     `
                 }
             ]
+            //passa o historico de interacoes como contexto para o modelo
+            for (const item of history) {
+                initialPrompts.push({
+                    role: 'user',
+                    content: item.user
+                })
+                initialPrompts.push({
+                    role: 'assistant',
+                    content: item.system
+                })
+            }
 
             const question = message
 
